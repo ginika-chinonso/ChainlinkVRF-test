@@ -1,18 +1,26 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const [addr1] = await ethers.getSigners();
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const VRFCoordinator = "0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D"
+  const SubID = 10101;
 
-  await lock.deployed();
+  const RANNUM = await ethers.getContractFactory("RANNUM");
 
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  const Rannum = await RANNUM.deploy(SubID, VRFCoordinator);
+
+  await Rannum.deployed();
+
+  console.log(`Contract deployed at address: ${await Rannum.address}`)
+
+  await Rannum.getReqID();
+
+  const number = await Rannum.getRandomNum();
+
+  console.log(`Your random number is: ${number}`);
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
